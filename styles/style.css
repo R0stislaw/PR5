@@ -1,0 +1,81 @@
+html {
+  text-align: center;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid black;
+  max-width: 800px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+table td {
+  border: 1px solid black;
+  padding: 5px 15px;
+}
+#sortBtns{
+    display: flex;
+    justify-content: space-around;
+    margin: 0 auto;
+    width: 30%;
+    margin-bottom: 1rem;
+    
+}
+td.contentCell {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 800px;
+  overflow: hidden;
+}
+
+.checkBtn {
+  margin-right: 10px;
+}
+
+.deleteBtn {
+  margin-left: auto;
+}
+
+.contentRow,
+.contentTime {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+input#taskInput {
+  margin: 1rem 0;
+}
+
+div.header {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+div.contentRow {
+  font-size: 1.2rem;
+}
+
+div.contentTime {
+  font-size: 0.9rem;
+}
+.gray {
+  color: gray;
+  font-style: italic;
+  text-decoration: line-through;
+}
+td,
+th {
+  user-select: none;
+}
+input[type="button"] {
+    cursor: pointer;
+    width: 100px;
+    height: 20px;
+    text-align: center;
+}
