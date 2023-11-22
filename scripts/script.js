@@ -5,20 +5,20 @@ document.addEventListener("DOMContentLoaded", function () {
     let tasks = [];
 
     taskInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" && taskInput.value.trim() !== "") { 
+        if (e.key === "Enter" && taskInput.value.trim() !== "") {
             addToTable(taskInput.value);
             taskInput.value = "";
-            saveTasksToLocalStorage()
+            saveTasksToLocalStorage();
         }
-        
     });
 
     function addToTable(content, time, isChecked) {
         const newRow = createRow(content, time, isChecked);
-        table.insertBefore(newRow, table.firstChild);
-        
+        table.appendChild(newRow);
+        // table.insertBefore(newRow, table.firstChild);
     }
-
+    
+    
     function createRow(content, time, isChecked) {
         const newRow = document.createElement("tr");
         const newCell = newRow.insertCell(0);
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
         deleteBtn.className = "deleteBtn";
         deleteBtn.value = "x";
 
-        let creationTime = time || (new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString());
+        const creationTime = time || (new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString());
         contentRow.className = "contentRow";
         contentTime.className = "contentTime";
         contentRow.textContent = content;
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         deleteBtn.addEventListener("click", function () {
             newRow.remove();
-            saveTasksToLocalStorage() 
+            saveTasksToLocalStorage();
         });
 
         checkBtn.checked = isChecked;
@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     checkBtn.checked = true;
                     return;
                 }
-            
+                saveTasksToLocalStorage();
             }
 
             isChecked = !isChecked;
@@ -76,34 +76,48 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 contentRow.classList.remove("gray");
             }
-            saveTasksToLocalStorage()
+            saveTasksToLocalStorage();
         });
 
         contentRow.addEventListener('dblclick', function () {
-            if (!isChecked && !isEditing) {  
+            if (!isChecked && !isEditing) {
                 isEditing = true;
+                const oldText = contentRow.textContent;
                 const editLine = document.createElement('input');
-                editLine.value = contentRow.innerText;
+                editLine.value = oldText;
                 contentRow.innerHTML = '';
                 contentRow.appendChild(editLine);
                 checkBtn.disabled = true;
-                deleteBtn.disabled = true
-                editLine.focus()
-    
+                deleteBtn.disabled = true;
+                editLine.focus();
+        
                 editLine.addEventListener("keydown", function (e) {
                     if (e.key === "Enter" && editLine.value.trim() !== "") {
-                        contentRow.innerHTML = editLine.value;
+                        contentRow.textContent = editLine.value;
                         isEditing = false;
                         checkBtn.disabled = false;
-                        deleteBtn.disabled = false
+                        deleteBtn.disabled = false;
+                        saveTasksToLocalStorage();
+                    } else if (e.key === "Enter") {
+                        editLine.focus();
+                    } else if (e.key === "Escape") {
+                        contentRow.textContent = oldText;
+                        isEditing = false;
+                        checkBtn.disabled = false;
+                        deleteBtn.disabled = false;
                     }
                 });
+        
+                editLine.addEventListener("blur", function () {
+                    contentRow.textContent = oldText;
+                    isEditing = false;
+                    checkBtn.disabled = false;
+                    deleteBtn.disabled = false;
+                });
             }
-            saveTasksToLocalStorage()
         });
-        
+
         return newRow;
-        
     }
 
     function saveTasksToLocalStorage() {
@@ -123,8 +137,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (localStorage.getItem("tasks")) {
         tasks = JSON.parse(localStorage.getItem("tasks"));
-        tasks.forEach(task => {
-            addToTable(task.text, task.time, task.checked);
+        tasks.forEach(({ text, time, checked }) => {
+            addToTable(text, time, checked);
         });
     }
 
@@ -134,11 +148,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const aChecked = a.querySelector(".checkBtn").checked;
             const bChecked = b.querySelector(".checkBtn").checked;
 
-            if (isCompleted) {
-                return aChecked - bChecked;
-            } else {
-                return bChecked - aChecked;
-            }
+            return isCompleted ? aChecked - bChecked : bChecked - aChecked;
         });
 
         while (table.firstChild) {
@@ -154,6 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.addEventListener("click", function () {
             const isCompleted = btn.value === "Виконані";
             sortTable(isCompleted);
+            saveTasksToLocalStorage();
         });
     });
 });
